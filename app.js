@@ -160,30 +160,61 @@ function mostrarMensaje(texto) {
   }, 3000);
 }
 
-// ---------- Pantalla del nombre ----------
-document.getElementById("form-nombre").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const n = document.getElementById("input-nombre").value.trim();
-  const error = document.getElementById("error-nombre");
-  if (!n) {
-    error.classList.remove("oculto");
-    return;
-  }
-  error.classList.add("oculto");
-  nombreCliente = n;
-  guardarNombre(n);
-  entrarATienda();
-});
+// ---------- Pantalla del nombre y celular ----------
+let telefonoCliente = "";
+
+function leerTelefono() {
+  try { return localStorage.getItem("telefonoCliente") || ""; } catch (e) { return ""; }
+}
+
+function guardarTelefono(t) {
+  try { localStorage.setItem("telefonoCliente", t); } catch (e) {}
+}
+
+// El campo de celular solo acepta números (máximo 8 dígitos)
+const inputTelefono = document.getElementById("input-telefono");
+if (inputTelefono) {
+  inputTelefono.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 8);
+  });
+}
+
+// Envío del formulario de nombre y teléfono
+const formNombre = document.getElementById("form-nombre");
+if (formNombre) {
+  formNombre.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const n = document.getElementById("input-nombre").value.trim();
+    const t = inputTelefono.value.replace(/\D/g, "");
+    const errorNombre = document.getElementById("error-nombre");
+    const errorTelefono = document.getElementById("error-telefono");
+
+    errorNombre.classList.toggle("oculto", n !== "");
+    errorTelefono.classList.toggle("oculto", t.length === 8);
+    if (!n || t.length !== 8) return;
+
+    nombreCliente = n;
+    telefonoCliente = t;
+    guardarNombre(n);
+    guardarTelefono(t);
+    entrarATienda();
+  });
+}
 
 function entrarATienda() {
   document.getElementById("nombre-cliente").textContent = nombreCliente;
   mostrar("pantalla-inicio");
 }
 
-document.getElementById("cambiar-nombre").addEventListener("click", function () {
-  document.getElementById("input-nombre").value = nombreCliente;
-  mostrar("pantalla-nombre");
-});
+// Botón para cambiar los datos guardados
+const cambiarNombreBtn = document.getElementById("cambiar-nombre");
+if (cambiarNombreBtn) {
+  cambiarNombreBtn.addEventListener("click", function () {
+    document.getElementById("input-nombre").value = nombreCliente;
+    document.getElementById("input-telefono").value = telefonoCliente;
+    mostrar("pantalla-nombre");
+  });
+}
 
 // ---------- Pantalla 1: tamaños ----------
 const catalogo = document.getElementById("catalogo");
@@ -423,6 +454,7 @@ document.getElementById("enviar-pedido").addEventListener("click", async functio
     const res = await db.from("pedidos").insert({
       id: id,
       cliente: nombreCliente,
+      telefono: telefonoCliente,
       items: carrito,
       total: totalCarrito(),
       comprobante: ruta,
@@ -446,9 +478,11 @@ document.getElementById("enviar-pedido").addEventListener("click", async functio
 });
 // ---------- Inicio ----------
 nombreCliente = leerNombre();
+telefonoCliente = leerTelefono();
 dibujarCarrito();
-if (nombreCliente) {
+if (nombreCliente && telefonoCliente) {
   entrarATienda();
 } else {
+  document.getElementById("input-nombre").value = nombreCliente;
   mostrar("pantalla-nombre");
 }
