@@ -310,6 +310,7 @@
               <span>${escapar(fecha)}</span>
             </div>
             <p class="etiqueta-pago ${efectivo ? "efectivo" : "sinpe"}">${efectivo ? "Pago en efectivo" : "Pago por SINPE Móvil"}</p>
+            ${p.telefono ? `<p>📞 <a href="tel:${escapar(p.telefono)}" style="color:var(--naranja)">${escapar(p.telefono)}</a></p>` : ""}
             ${items}
             <p class="total-grande">Total: ${dinero(p.total)}</p>
             ${imagen}
