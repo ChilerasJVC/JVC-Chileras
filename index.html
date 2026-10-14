@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVC Chileras</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="JVC Chilera" class="logo" onerror="this.remove(); document.getElementById('titulo-marca').classList.remove('oculto');">
+    <h1 id="titulo-marca" class="oculto">JVC Chileras</h1>
+    <p class="lema">Pide tus chileras en línea</p>
+  </header>
+
+  <main>
+    <div id="mensaje" class="mensaje oculto"></div>
+
+    <!-- Pantalla: nombre del cliente -->
+    <section id="pantalla-nombre" class="pantalla oculto">
+      <h2>¡Bienvenido!</h2>
+      <div class="recuadro-unico">
+        <form id="form-nombre">
+          <h3>¿Cuál es tu nombre y empresa?</h3>
+          <input type="text" id="input-nombre" maxlength="60" placeholder="Tu nombre y empresa" autocomplete="off">
+          <p id="error-nombre" class="error oculto">Escribe tu nombre y empresa para continuar</p>
+          <button type="submit" class="btn-chile btn-grande">Entrar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Pantalla 1: tamaños -->
+    <section id="pantalla-inicio" class="pantalla oculto">
+      <p class="saludo">Hola, <strong id="nombre-cliente"></strong> · <button class="enlace" id="cambiar-nombre">Cambiar nombre</button></p>
+      <h2>Nuestros productos</h2>
+      <div id="catalogo"></div>
+    </section>
+
+    <!-- Pantalla 2: variedad -->
+    <section id="pantalla-variedad" class="pantalla oculto">
+      <div class="cabecera-pantalla">
+        <button class="volver" id="volver-inicio">← Volver al inicio</button>
+        <h2 id="titulo-variedad"></h2>
+      </div>
+      <div class="recuadro-unico">
+        <div id="opciones-variedad" class="opciones"></div>
+      </div>
+    </section>
+
+    <!-- Pantalla 3: picor y nota -->
+    <section id="pantalla-final" class="pantalla oculto">
+      <div class="cabecera-pantalla">
+        <button class="volver" id="volver-variedad">← Volver</button>
+        <h2>Personaliza tu pedido</h2>
+      </div>
+      <div class="recuadro-unico">
+        <div id="resumen-eleccion"></div>
+
+        <h3>Picor</h3>
+        <div class="picores">
+          <label><input type="radio" name="picor" value="Muy picante"> Muy picante</label>
+          <label><input type="radio" name="picor" value="Normal" checked> Normal</label>
+          <label><input type="radio" name="picor" value="Suave"> Suave</label>
+        </div>
+
+        <h3>Nota (opcional)</h3>
+        <textarea id="nota" maxlength="200" placeholder="Ej: sin cebolla, sin chile dulce, etc."></textarea>
+
+        <button id="agregar-carrito" class="btn-chile btn-grande">Agregar al carrito</button>
+      </div>
+    </section>
+
+    <!-- Pantalla 4: método de pago -->
+    <section id="pantalla-pago" class="pantalla oculto">
+      <div class="cabecera-pantalla">
+        <button class="volver" id="volver-carrito">← Volver</button>
+        <h2>Finalizar pedido</h2>
+      </div>
+      <div class="recuadro-unico">
+        <div id="resumen-pedido"></div>
+        <p id="total-pago" class="total-grande"></p>
+
+        <h3>¿Cómo vas a pagar?</h3>
+        <div class="metodos">
+          <label class="metodo"><input type="radio" name="metodo" value="sinpe" checked> SINPE Móvil <small>(recomendado)</small></label>
+          <label class="metodo"><input type="radio" name="metodo" value="efectivo"> Efectivo</label>
+        </div>
+
+        <!-- Si paga por SINPE Móvil -->
+        <div id="bloque-sinpe">
+          <div class="sinpe">
+            <h3>Paga por SINPE Móvil</h3>
+            <p>Número: <strong id="sinpe-numero"></strong></p>
+            <p>A nombre de: <strong id="sinpe-nombre"></strong></p>
+            <p>Monto: <strong id="sinpe-monto"></strong></p>
+          </div>
+
+          <h3>Sube la captura del comprobante</h3>
+          <input type="file" id="comprobante" accept="image/*">
+          <img id="vista-previa" class="vista-previa oculto" alt="Vista previa del comprobante">
+        </div>
+
+        <!-- Si paga en efectivo -->
+        <div id="bloque-efectivo" class="aviso-efectivo oculto">
+          <h3>Pago en efectivo</h3>
+          <p>Pagarás en efectivo. Nos pondremos en contacto contigo para coordinar el pago.</p>
+          <p>Monto a pagar: <strong id="efectivo-monto"></strong></p>
+        </div>
+
+        <p id="error-pago" class="error oculto"></p>
+
+        <button id="enviar-pedido" class="btn-chile btn-grande">Enviar pedido</button>
+      </div>
+    </section>
+
+    <!-- Pantalla 5: pedido enviado -->
+    <section id="pantalla-exito" class="pantalla oculto">
+      <div class="recuadro-unico">
+        <h2>¡Pedido enviado!</h2>
+        <p id="mensaje-exito"></p>
+        <button id="volver-tienda" class="btn-chile btn-grande">Volver al inicio</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="redes">
+      <a id="enlace-tiktok" class="red oculto" target="_blank" rel="noopener">TikTok</a>
+      <a id="enlace-whatsapp" class="red oculto" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <p>JVC Chileras · Pedidos en línea</p>
+  </footer>
+
+  <!-- Botón flotante con forma de carro de compras -->
+  <button id="boton-carrito" title="Ver mi carrito" aria-label="Abrir carrito">
+    <svg viewBox="0 0 110 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="degradado-carro" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#e8452c"/>
+          <stop offset="1" stop-color="#f7931e"/>
+        </linearGradient>
+      </defs>
+      <path d="M4 8 H20 L32 58 H88" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 20 H102 L92 50 H31 Z" fill="url(#degradado-carro)" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="40" cy="76" r="9" fill="#ffffff"/>
+      <circle cx="82" cy="76" r="9" fill="#ffffff"/>
+    </svg>
+    <span id="contador-carrito">0</span>
+  </button>
+
+  <!-- Ventana con la información del carrito -->
+  <div id="fondo-carrito" class="oculto">
+    <div id="panel-carrito">
+      <button id="cerrar-carrito" aria-label="Cerrar carrito">✕</button>
+      <div id="carrito">
+        <h2 id="carrito-titulo">Tu carrito (0)</h2>
+        <div id="carrito-lista"></div>
+        <p id="carrito-total"></p>
+        <div class="centro">
+          <button id="finalizar" class="btn-chile btn-grande oculto">Finalizar pedido</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+  <script src="carrito-ui.js"></script>
+</body>
+</html>
