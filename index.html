@@ -23,18 +23,23 @@
     <section id="pantalla-nombre" class="pantalla oculto">
       <h2>¡Bienvenido!</h2>
       <div class="recuadro-unico">
-        <form id="form-nombre">
-          <h3>¿Cuál es tu nombre y empresa?</h3>
-          <input type="text" id="input-nombre" maxlength="60" placeholder="Tu nombre y empresa" autocomplete="off">
-          <p id="error-nombre" class="error oculto">Escribe tu nombre y empresa para continuar</p>
-          <button type="submit" class="btn-chile btn-grande">Entrar</button>
-        </form>
+       <form id="form-nombre">
+  <h3>¿Cuál es tu nombre?</h3>
+  <input type="text" id="input-nombre" maxlength="60" placeholder="Tu nombre" autocomplete="name">
+  <p id="error-nombre" class="error oculto">Escribe tu nombre para continuar</p>
+
+  <h3>Escribe tu número de celular</h3>
+  <input type="tel" id="input-telefono" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Para que tu proveedor se ponga en contacto contigo" autocomplete="tel">
+  <p id="error-telefono" class="error oculto">Escribe tu número de celular (8 dígitos, solo números)</p>
+
+  <button type="submit" class="btn-chile btn-grande">Entrar</button>
+</form>
       </div>
     </section>
 
     <!-- Pantalla 1: tamaños -->
     <section id="pantalla-inicio" class="pantalla oculto">
-      <p class="saludo">Hola, <strong id="nombre-cliente"></strong> · <button class="enlace" id="cambiar-nombre">Cambiar nombre</button></p>
+      <p class="saludo">Hola, <strong id="nombre-cliente"></strong> · <button class="enlace" id="cambiar-nombre">Cambiar mis datos</button></p>
       <h2>Nuestros productos</h2>
       <div id="catalogo"></div>
     </section>
@@ -67,7 +72,7 @@
         </div>
 
         <h3>Nota (opcional)</h3>
-        <textarea id="nota" maxlength="200" placeholder="Ej: sin cebolla, sin chile dulce, etc."></textarea>
+        <textarea id="nota" maxlength="200" placeholder="Ej: Sin cebolla / para cuando necesitas la chilera"></textarea>
 
         <button id="agregar-carrito" class="btn-chile btn-grande">Agregar al carrito</button>
       </div>
