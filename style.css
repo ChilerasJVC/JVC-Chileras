@@ -374,7 +374,8 @@ textarea {
   font-family: inherit;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="tel"] {
   width: 100%;
   box-sizing: border-box;
   padding: 12px;
