@@ -698,3 +698,76 @@ body:has(#pantalla-exito:not(.oculto)) #boton-carrito {
     padding: 0 8px;
   }
 }
+
+
+/* ---------- Estrella de oferta (decorativa, no se puede tocar) ---------- */
+.estrella-oferta {
+  --e: clamp(96px, 29vw, 118px);
+  position: absolute;
+  top: 10px;
+  right: max(2px, calc(50% - 330px));
+  width: var(--e);
+  height: var(--e);
+  font-size: calc(var(--e) * 0.072);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 2;
+  transform: rotate(8deg);
+  animation: estrella-latido 2.4s ease-in-out infinite;
+}
+
+.estrella-forma {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(247, 147, 30, 0.9));
+  animation: estrella-parpadeo 1.2s ease-in-out infinite;
+}
+
+.estrella-texto {
+  position: absolute;
+  inset: 19%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+.estrella-texto strong {
+  font-size: 1.35em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f7931e;
+}
+
+.estrella-texto span {
+  font-weight: 700;
+}
+
+.estrella-texto b {
+  display: block;
+  font-size: 1.45em;
+  color: #f5c518;
+}
+
+@keyframes estrella-parpadeo {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(247, 147, 30, 0.95)); }
+  50%      { opacity: 0.6; filter: drop-shadow(0 0 2px rgba(247, 147, 30, 0.4)); }
+}
+
+@keyframes estrella-latido {
+  0%, 100% { transform: rotate(8deg) scale(1); }
+  50%      { transform: rotate(8deg) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estrella-oferta,
+  .estrella-forma {
+    animation: none;
+  }
+}
