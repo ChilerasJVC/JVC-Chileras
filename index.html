@@ -11,6 +11,17 @@
 </head>
 <body>
   <header>
+    <!-- Estrella de oferta (solo decorativa: no se puede tocar) -->
+    <div id="estrella-oferta" class="estrella-oferta oculto" role="note">
+      <svg class="estrella-forma" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="50.0,0.0 60.4,11.4 75.0,6.7 78.3,21.7 93.3,25.0 88.6,39.6 100.0,50.0 88.6,60.4 93.3,75.0 78.3,78.3 75.0,93.3 60.4,88.6 50.0,100.0 39.6,88.6 25.0,93.3 21.7,78.3 6.7,75.0 11.4,60.4 0.0,50.0 11.4,39.6 6.7,25.0 21.7,21.7 25.0,6.7 39.6,11.4"
+                 fill="#000000" stroke="#f7931e" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <div class="estrella-texto">
+        <strong>Oferta</strong>
+        <span>Si nos entregas el frasco, la siguiente chilera cuesta <b id="oferta-precio"></b></span>
+      </div>
+    </div>
     <img src="logo.png" alt="JVC Chilera" class="logo" onerror="this.remove(); document.getElementById('titulo-marca').classList.remove('oculto');">
     <h1 id="titulo-marca" class="oculto">JVC Chileras</h1>
     <p class="lema">Tus chileras favoritas en línea</p>
@@ -29,7 +40,7 @@
   <p id="error-nombre" class="error oculto">Escribe tu nombre para continuar</p>
 
   <h3>Escribe tu número de celular</h3>
-  <input type="tel" id="input-telefono" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Tu proveedor se pondrá en contacto" autocomplete="tel">
+  <input type="tel" id="input-telefono" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Para que tu proveedor se ponga en contacto contigo" autocomplete="tel">
   <p id="error-telefono" class="error oculto">Escribe tu número de celular (8 dígitos, solo números)</p>
 
   <button type="submit" class="btn-chile btn-grande">Entrar</button>
