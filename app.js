@@ -80,9 +80,9 @@ function frascoSVG(id, alto) {
 
 // ---------- Datos ----------
 const productos = [
-  { id: 1, tamano: "pequeña", nombre: "Chilera pequeña", volumen: "100 ml", alto: 110, precio: 1000 },
-  { id: 2, tamano: "mediana", nombre: "Chilera mediana", volumen: "260 ml", alto: 130, precio: 2000 },
-  { id: 3, tamano: "grande", nombre: "Chilera grande", volumen: "770 ml", alto: 150, precio: 3000 }
+  { id: 1, tamano: "pequeña", nombre: "Chilera pequeña", volumen: "100 ml", alto: 110, precio: 1000, oferta: 800 },
+  { id: 2, tamano: "mediana", nombre: "Chilera mediana", volumen: "260 ml", alto: 130, precio: 2000, oferta: 1800 },
+  { id: 3, tamano: "grande", nombre: "Chilera grande", volumen: "770 ml", alto: 150, precio: 3000, oferta: 2800 }
 ];
 
 // "extra" es lo que se suma al precio si esa variedad cuesta más (0 = mismo precio)
@@ -147,7 +147,19 @@ function mostrar(idPantalla) {
     p.classList.add("oculto");
   });
   document.getElementById(idPantalla).classList.remove("oculto");
+  actualizarEstrella(idPantalla);
   window.scrollTo(0, 0);
+}
+
+// Estrella de oferta: solo aparece al elegir un tamaño (pantallas de variedad y personalizar)
+function actualizarEstrella(idPantalla) {
+  const estrella = document.getElementById("estrella-oferta");
+  const conOferta = (idPantalla === "pantalla-variedad" || idPantalla === "pantalla-final")
+    && seleccion.producto && seleccion.producto.oferta;
+  if (conOferta) {
+    document.getElementById("oferta-precio").textContent = dinero(seleccion.producto.oferta);
+  }
+  estrella.classList.toggle("oculto", !conOferta);
 }
 
 function mostrarMensaje(texto) {
@@ -171,50 +183,39 @@ function guardarTelefono(t) {
   try { localStorage.setItem("telefonoCliente", t); } catch (e) {}
 }
 
-// El campo de celular solo acepta números (máximo 8 dígitos)
-const inputTelefono = document.getElementById("input-telefono");
-if (inputTelefono) {
-  inputTelefono.addEventListener("input", function () {
-    this.value = this.value.replace(/\D/g, "").slice(0, 8);
-  });
-}
+// El campo de celular solo acepta números
+document.getElementById("input-telefono").addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "").slice(0, 8);
+});
 
-// Envío del formulario de nombre y teléfono
-const formNombre = document.getElementById("form-nombre");
-if (formNombre) {
-  formNombre.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const n = document.getElementById("input-nombre").value.trim();
-    const t = inputTelefono.value.replace(/\D/g, "");
-    const errorNombre = document.getElementById("error-nombre");
-    const errorTelefono = document.getElementById("error-telefono");
+document.getElementById("form-nombre").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const n = document.getElementById("input-nombre").value.trim();
+  const t = document.getElementById("input-telefono").value.replace(/\D/g, "");
+  const errorNombre = document.getElementById("error-nombre");
+  const errorTelefono = document.getElementById("error-telefono");
 
-    errorNombre.classList.toggle("oculto", n !== "");
-    errorTelefono.classList.toggle("oculto", t.length === 8);
-    if (!n || t.length !== 8) return;
+  errorNombre.classList.toggle("oculto", n !== "");
+  errorTelefono.classList.toggle("oculto", t.length === 8);
+  if (!n || t.length !== 8) return;
 
-    nombreCliente = n;
-    telefonoCliente = t;
-    guardarNombre(n);
-    guardarTelefono(t);
-    entrarATienda();
-  });
-}
+  nombreCliente = n;
+  telefonoCliente = t;
+  guardarNombre(n);
+  guardarTelefono(t);
+  entrarATienda();
+});
 
 function entrarATienda() {
   document.getElementById("nombre-cliente").textContent = nombreCliente;
   mostrar("pantalla-inicio");
 }
 
-// Botón para cambiar los datos guardados
-const cambiarNombreBtn = document.getElementById("cambiar-nombre");
-if (cambiarNombreBtn) {
-  cambiarNombreBtn.addEventListener("click", function () {
-    document.getElementById("input-nombre").value = nombreCliente;
-    document.getElementById("input-telefono").value = telefonoCliente;
-    mostrar("pantalla-nombre");
-  });
-}
+document.getElementById("cambiar-nombre").addEventListener("click", function () {
+  document.getElementById("input-nombre").value = nombreCliente;
+  document.getElementById("input-telefono").value = telefonoCliente;
+  mostrar("pantalla-nombre");
+});
 
 // ---------- Pantalla 1: tamaños ----------
 const catalogo = document.getElementById("catalogo");
@@ -476,6 +477,7 @@ document.getElementById("enviar-pedido").addEventListener("click", async functio
     boton.textContent = textoOriginal;
   }
 });
+
 // ---------- Inicio ----------
 nombreCliente = leerNombre();
 telefonoCliente = leerTelefono();
