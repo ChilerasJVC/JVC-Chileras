@@ -80,8 +80,8 @@ function frascoSVG(id, alto) {
 
 // ---------- Datos ----------
 const productos = [
-  { id: 1, tamano: "pequeña", nombre: "Chilera pequeña", volumen: "100 ml", alto: 110, precio: 1000, oferta: 800 },
-  { id: 2, tamano: "mediana", nombre: "Chilera mediana", volumen: "260 ml", alto: 130, precio: 2000, oferta: 1800 },
+  { id: 1, tamano: "pequeña", nombre: "Chilera pequeña", volumen: "265 ml", alto: 110, precio: 1000, oferta: 800 },
+  { id: 2, tamano: "mediana", nombre: "Chilera mediana", volumen: "460 ml", alto: 130, precio: 2000, oferta: 1800 },
   { id: 3, tamano: "grande", nombre: "Chilera grande", volumen: "770 ml", alto: 150, precio: 3000, oferta: 2800 }
 ];
 
