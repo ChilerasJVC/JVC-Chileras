@@ -158,6 +158,50 @@
       padding: 10px 16px;
     }
 
+    #fondo-cantidad {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .cuadro-cantidad {
+      width: 100%;
+      max-width: 340px;
+      background: var(--tarjeta);
+      border-radius: 12px;
+      border-bottom: 4px solid var(--naranja);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .cuadro-cantidad p {
+      margin: 0 0 14px;
+    }
+
+    .cuadro-cantidad input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      font-size: 24px;
+      text-align: center;
+      background: #000;
+      color: var(--blanco);
+      border: 1px solid #555;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .cuadro-cantidad .botones {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
     .mini {
       background: var(--naranja);
       color: #000;
@@ -329,7 +373,9 @@
             <option value="grande">Grande</option>
           </select>
           <p id="error-frasco" class="error oculto"></p>
-          <button type="submit" class="btn-chile btn-grande">Guardar frasco</button>
+          <div class="centro">
+            <button type="submit" class="btn-chile btn-grande">Guardar frasco</button>
+          </div>
         </form>
       </div>
 
@@ -346,6 +392,19 @@
       <button id="cerrar-sesion">Cerrar sesión</button>
     </div>
   </main>
+
+  <!-- Ventana para pedir una cantidad (solo números enteros) -->
+  <div id="fondo-cantidad" class="oculto">
+    <div class="cuadro-cantidad">
+      <p id="texto-cantidad"></p>
+      <input type="text" id="campo-cantidad" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="0" autocomplete="off">
+      <p id="error-cantidad" class="error oculto">Escribe un número entero mayor que cero.</p>
+      <div class="botones">
+        <button type="button" class="mini gris" id="cancelar-cantidad">Cancelar</button>
+        <button type="button" class="mini" id="aceptar-cantidad">Aceptar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -660,16 +719,47 @@
       }).join("");
     }
 
+    // Ventana que pide una cantidad: solo deja escribir números enteros
+    function pedirCantidad(texto) {
+      return new Promise(function (resolver) {
+        const fondo = el("fondo-cantidad");
+        const campo = el("campo-cantidad");
+        const error = el("error-cantidad");
+        el("texto-cantidad").textContent = texto;
+        campo.value = "";
+        error.classList.add("oculto");
+        fondo.classList.remove("oculto");
+        setTimeout(function () { campo.focus(); }, 50);
+
+        function cerrar(valor) {
+          fondo.classList.add("oculto");
+          resolver(valor);
+        }
+        function aceptar() {
+          const n = parseInt(campo.value, 10);
+          if (!n || n <= 0) { error.classList.remove("oculto"); return; }
+          cerrar(n);
+        }
+
+        campo.oninput = function () { this.value = this.value.replace(/\D/g, "").slice(0, 4); };
+        campo.onkeydown = function (e) {
+          if (e.key === "Enter") { e.preventDefault(); aceptar(); }
+          if (e.key === "Escape") cerrar(null);
+        };
+        el("aceptar-cantidad").onclick = aceptar;
+        el("cancelar-cantidad").onclick = function () { cerrar(null); };
+        fondo.onclick = function (e) { if (e.target === fondo) cerrar(null); };
+      });
+    }
+
     el("lista-stock").addEventListener("click", async function (e) {
       const b = e.target.closest("button[data-accion]");
       if (!b) return;
       const sumar = b.dataset.accion === "sumar";
-      const txt = prompt(sumar
+      const n = await pedirCantidad(sumar
         ? "¿Cuántos frascos agregaste al inventario?"
-        : "¿Cuántos frascos quieres quitar? (dañados, regalados, vendidos fuera de la página...)", "1");
-      if (txt === null) return;
-      const n = parseInt(txt, 10);
-      if (!n || n <= 0) { alert("Escribe un número mayor que cero."); return; }
+        : "¿Cuántos frascos quieres quitar? (dañados, regalados, vendidos fuera de la página...)");
+      if (n === null) return;
 
       b.disabled = true;
       const res = await db.rpc("ajustar_stock", {
