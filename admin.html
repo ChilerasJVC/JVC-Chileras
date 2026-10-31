@@ -51,6 +51,7 @@
     }
 
     .pedido {
+      position: relative;
       max-width: 560px;
       margin: 0 auto 16px;
       background: var(--tarjeta);
@@ -70,6 +71,47 @@
     .pedido-cab span {
       color: #bbb;
       font-size: 14px;
+    }
+
+    .borrar-pedido + .pedido-cab {
+      padding-right: 34px;
+    }
+
+    .borrar-pedido {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid #e53935;
+      border-radius: 50%;
+      color: #e53935;
+      cursor: pointer;
+    }
+
+    .borrar-pedido svg {
+      width: 12px;
+      height: 12px;
+      pointer-events: none;
+    }
+
+    .borrar-pedido:active {
+      background: #e53935;
+      color: #000;
+    }
+
+    .borrar-pedido:disabled {
+      opacity: 0.5;
+    }
+
+    .mini.rojo {
+      background: #e53935;
+      color: #fff;
     }
 
     .etiqueta-pago {
@@ -158,7 +200,8 @@
       padding: 10px 16px;
     }
 
-    #fondo-cantidad {
+    #fondo-cantidad,
+    #fondo-confirmar {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.75);
@@ -406,6 +449,17 @@
     </div>
   </div>
 
+  <!-- Ventana para confirmar que se elimina un pedido -->
+  <div id="fondo-confirmar" class="oculto">
+    <div class="cuadro-cantidad">
+      <p id="texto-confirmar"></p>
+      <div class="botones">
+        <button type="button" class="mini gris" id="cancelar-confirmar">Cancelar</button>
+        <button type="button" class="mini rojo" id="aceptar-confirmar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ---------- Configuración ----------
@@ -575,6 +629,7 @@
 
         return `
           <article class="pedido">
+            <button type="button" class="borrar-pedido" data-borrar="${escapar(p.id)}" aria-label="Eliminar pedido" title="Eliminar pedido"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
             <div class="pedido-cab">
               <strong>${escapar(p.cliente)}</strong>
               <span>${escapar(fecha)}</span>
@@ -590,7 +645,49 @@
       }).join("");
     }
 
+    // Ventana de confirmar / cancelar
+    function confirmarAccion(texto) {
+      return new Promise(function (resolver) {
+        const fondo = el("fondo-confirmar");
+        el("texto-confirmar").textContent = texto;
+        fondo.classList.remove("oculto");
+        function cerrar(v) { fondo.classList.add("oculto"); resolver(v); }
+        el("aceptar-confirmar").onclick = function () { cerrar(true); };
+        el("cancelar-confirmar").onclick = function () { cerrar(false); };
+        fondo.onclick = function (e) { if (e.target === fondo) cerrar(false); };
+      });
+    }
+
     el("lista-pedidos").addEventListener("click", async function (e) {
+      const borrar = e.target.closest(".borrar-pedido");
+      if (borrar) {
+        const pedido = pedidosPorId[borrar.dataset.borrar];
+        if (!pedido) return;
+        const ok = await confirmarAccion("¿Eliminar el pedido de " + pedido.cliente + "? Luego no lo puedes recuperar.");
+        if (!ok) return;
+
+        borrar.disabled = true;
+        const del = await db.from("pedidos").delete().eq("id", pedido.id).select("id");
+        if (del.error || !del.data || del.data.length === 0) {
+          console.error(del.error);
+          alert("No se pudo eliminar el pedido. Falta el permiso de borrar en Supabase (corre eliminar_pedidos.sql).");
+          borrar.disabled = false;
+          return;
+        }
+
+        // Si ya estaba atendido, devuelve los frascos al inventario
+        if (pedido.estado === "atendido") {
+          const aviso = await sincronizarStock(pedido, false);
+          if (aviso) alert("El pedido se eliminó, pero: " + aviso);
+        }
+        // Borra la foto del comprobante (si no hay permiso, simplemente se queda)
+        if (pedido.comprobante) {
+          try { await db.storage.from("comprobantes").remove([pedido.comprobante]); } catch (err) { console.error(err); }
+        }
+        cargarPedidos();
+        return;
+      }
+
       const boton = e.target.closest(".atender");
       if (!boton) return;
 
